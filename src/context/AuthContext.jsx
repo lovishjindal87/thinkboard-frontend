@@ -23,10 +23,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const loginWithGoogle = () => {
+    // Use environment variable if available, otherwise fallback to hardcoded backend URL
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://thinkboard-backend-unique.vercel.app";
     const base =
       import.meta.env.MODE === "development"
         ? "http://localhost:5001/api"
-        : "/api";
+        : `${BACKEND_URL}/api`;
     window.location.href = `${base}/auth/google`;
   };
 
