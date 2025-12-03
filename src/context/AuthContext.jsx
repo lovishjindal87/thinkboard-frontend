@@ -7,19 +7,45 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchMe = async () => {
+  const fetchMe = async (retryCount = 0) => {
     try {
       const res = await api.get("/auth/me");
       setUser(res.data);
-    } catch {
-      setUser(null);
-    } finally {
       setLoading(false);
+    } catch (error) {
+      console.log("Auth check failed:", error.response?.status, error.response?.data);
+      // Retry once after a short delay if we just came from OAuth redirect
+      if (retryCount === 0 && window.location.search.includes('auth=success')) {
+        console.log("Retrying auth check after OAuth redirect...");
+        setTimeout(() => {
+          fetchMe(1);
+        }, 1000);
+      } else {
+        setUser(null);
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
+    // Check if we're returning from OAuth (backend adds ?auth=success to redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('auth')) {
+      // Clean up the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
     fetchMe();
+    
+    // Re-check auth when window regains focus (e.g., after OAuth redirect)
+    const handleFocus = () => {
+      setTimeout(() => {
+        fetchMe();
+      }, 100);
+    };
+    
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   const loginWithGoogle = () => {
