@@ -7,13 +7,20 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchMe = async () => {
+  const fetchMe = async (retryCount = 0) => {
     try {
       const res = await api.get("/auth/me");
       setUser(res.data);
-    } catch {
+      setLoading(false);
+    } catch (error) {
+      // If we just logged in and got 401, retry once after a short delay
+      if (retryCount === 0 && error.response?.status === 401) {
+        setTimeout(() => {
+          fetchMe(1);
+        }, 500);
+        return;
+      }
       setUser(null);
-    } finally {
       setLoading(false);
     }
   };
@@ -21,11 +28,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Clean up OAuth redirect query param from URL
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('auth')) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
+    const isAuthRedirect = urlParams.has('auth');
     
-    fetchMe();
+    if (isAuthRedirect) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // Add a delay to ensure cookie is set after redirect, then retry if needed
+      setTimeout(() => {
+        fetchMe(0); // Start with retry count 0 to enable retry logic
+      }, 300);
+    } else {
+      fetchMe(1); // Skip retry for normal page loads
+    }
   }, []);
 
   const loginWithGoogle = () => {
