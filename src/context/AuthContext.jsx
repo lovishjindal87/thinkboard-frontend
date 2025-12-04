@@ -9,34 +9,23 @@ export const AuthProvider = ({ children }) => {
 
   const fetchMe = async (retryCount = 0) => {
     try {
-      console.log("Fetching /auth/me with credentials:", {
-        baseURL: api.defaults.baseURL,
-        withCredentials: api.defaults.withCredentials,
-      });
-      
       const res = await api.get("/auth/me");
-      console.log("Auth successful, user:", res.data);
       setUser(res.data);
       setLoading(false);
     } catch (error) {
-      console.error("Auth check failed:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-        config: {
-          url: error.config?.url,
-          baseURL: error.config?.baseURL,
-          withCredentials: error.config?.withCredentials,
-        },
-      });
-      
-      // Retry once after a short delay if we just came from OAuth redirect
-      if (retryCount === 0 && window.location.search.includes('auth=success')) {
-        console.log("Retrying auth check after OAuth redirect...");
-        setTimeout(() => {
-          fetchMe(1);
-        }, 1000);
+      // 401 is expected when not logged in
+      if (error.response?.status === 401) {
+        // Retry once after a delay if we just came from OAuth redirect
+        if (retryCount === 0 && window.location.search.includes('auth=success')) {
+          setTimeout(() => {
+            fetchMe(1);
+          }, 1000);
+          return;
+        }
+        setUser(null);
+        setLoading(false);
       } else {
+        // Other errors
         setUser(null);
         setLoading(false);
       }
