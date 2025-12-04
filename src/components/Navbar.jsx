@@ -27,24 +27,24 @@ const Navbar = () => {
   return (
     <header className="bg-base-300 border-b border-base-content/10">
       <div className="mx-auto max-w-6xl p-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-primary font-mono tracking-tight">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-3xl font-bold text-primary font-mono tracking-tight text-center sm:text-left">
             Thinkboard
           </h1>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
             {!loading && user && (
-              <Link to={"/create"} className="btn btn-primary">
+              <Link to={"/create"} className="btn btn-primary w-full sm:w-auto">
                 <PlusIcon className="size-5" />
                 <span>New Task</span>
               </Link>
             )}
             {!loading && !user && (
-              <button className="btn btn-outline btn-sm" onClick={loginWithGoogle}>
+              <button className="btn btn-outline btn-sm w-full sm:w-auto" onClick={loginWithGoogle}>
                 Sign in with Google
               </button>
             )}
             {!loading && user && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 {avatarSrc ? (
                   <img
                     src={avatarSrc}
@@ -57,8 +57,8 @@ const Navbar = () => {
                     {initials || "?"}
                   </div>
                 )}
-                <span className="text-sm text-base-content/80">{user.name}</span>
-                <button className="btn btn-ghost btn-sm" onClick={logout}>
+                <span className="text-sm text-base-content/80 truncate max-w-[120px] sm:max-w-none">{user.name}</span>
+                <button className="btn btn-ghost btn-sm w-full sm:w-auto" onClick={logout}>
                   Logout
                 </button>
               </div>
