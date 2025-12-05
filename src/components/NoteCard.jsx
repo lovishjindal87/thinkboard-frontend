@@ -127,12 +127,13 @@ const NoteCard = ({note, setNotes}) => {
             {formatDate(new Date(note.createdAt))}
           </span>
           <div className="flex items-center gap-1">
-            <PenSquareIcon className="size-4" />
+            <PenSquareIcon className="size-4" aria-hidden="true" />
             <button
               className="btn btn-ghost btn-xs text-error"
               onClick={(e) => handleDelete(e, note._id)}
+              aria-label="Delete note"
             >
-              <Trash2Icon className="size-4" />
+              <Trash2Icon className="size-4" aria-hidden="true" />
             </button>
           </div>
         </div>

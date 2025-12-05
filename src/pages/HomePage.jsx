@@ -139,7 +139,11 @@ const HomePage = () => {
             <p className="text-base-content/70 text-3xl">
               Please sign in with Google to manage your tasks.
             </p>
-            <img className=" w-full h-full mt-24" src="/sample-homepage.png" />
+            <img
+              className=" w-full h-full mt-24"
+              src="/sample-homepage.png"
+              alt="Illustration of organizing tasks in Thinkboard"
+            />
           </div>
         )}
 
